@@ -1,0 +1,27 @@
+2025-06-23 22:34:12,281 - INFO - Connected to MySQL
+2025-06-23 22:34:12,586 - INFO - Disconnected from MySQL
+2025-06-23 22:35:10,091 - INFO - Connected to MySQL
+2025-06-23 22:35:10,136 - INFO - Disconnected from MySQL
+2025-06-23 22:39:18,376 - INFO - Connected to MySQL
+2025-06-23 22:39:18,453 - INFO - Disconnected from MySQL
+2025-06-23 23:28:37,042 - ERROR - MySQL Connection Error: 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)
+2025-06-23 23:29:17,583 - INFO - Connected to MySQL
+2025-06-23 23:29:17,914 - INFO - Disconnected from MySQL
+2025-06-23 23:30:58,342 - INFO - Connected to MySQL
+2025-06-23 23:30:58,405 - INFO - Disconnected from MySQL
+2025-06-23 23:37:12,006 - INFO - Connected to MySQL
+2025-06-23 23:37:12,326 - INFO - Disconnected from MySQL
+2025-06-23 23:37:12,340 - INFO - Connected to MySQL
+2025-06-23 23:37:12,343 - INFO - Disconnected from MySQL
+2025-06-23 23:42:35,871 - INFO - Connected to MySQL
+2025-06-23 23:42:35,954 - INFO - Disconnected from MySQL
+2025-06-23 23:42:35,968 - INFO - Connected to MySQL
+2025-06-23 23:42:35,971 - INFO - Disconnected from MySQL
+2025-06-23 23:43:54,531 - INFO - Connected to MySQL
+2025-06-23 23:43:54,533 - INFO - Disconnected from MySQL
+2025-06-23 23:43:55,035 - INFO - Connected to MySQL
+2025-06-23 23:43:55,037 - INFO - Disconnected from MySQL
+2025-06-23 23:43:55,225 - INFO - Connected to MySQL
+2025-06-23 23:43:55,231 - INFO - Disconnected from MySQL
+2025-06-23 23:43:55,441 - INFO - Connected to MySQL
+2025-06-23 23:43:55,444 - INFO - Disconnected from MySQL

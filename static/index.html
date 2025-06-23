@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spreadsheet MySQL Sync</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 30px;
+            border: 2px solid #f0f0f0;
+            border-radius: 10px;
+            background: #fafafa;
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .file-upload input[type=file] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-upload-label {
+            display: block;
+            padding: 12px;
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            text-align: center;
+            color: #667eea;
+            font-weight: 600;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload:hover .file-upload-label {
+            background: #f8f9ff;
+            border-color: #764ba2;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .tables-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .table-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .table-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .table-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .table-info {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .row-flex {
+            display: flex;
+            gap: 15px;
+        }
+
+        .row-flex > * {
+            flex: 1;
+        }
+
+        @media (max-width: 768px) {
+            .row-flex {
+                flex-direction: column;
+            }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Spreadsheet MySQL Sync</h1>
+            <p>Upload and synchronize your spreadsheets with MySQL database</p>
+        </div>
+
+        <div class="content">
+            <!-- Database Configuration Section -->
+            <div class="section">
+                <h2>🔧 Database Configuration</h2>
+                <div class="row-flex">
+                    <div class="form-group">
+                        <label for="host">Host</label>
+                        <input type="text" id="host" value="localhost" placeholder="localhost">
+                    </div>
+                    <div class="form-group">
+                        <label for="port">Port</label>
+                        <input type="number" id="port" value="3306" placeholder="3306">
+                    </div>
+                </div>
+                <div class="row-flex">
+                    <div class="form-group">
+                        <label for="database">Database</label>
+                        <input type="text" id="database" placeholder="your_database_name">
+                    </div>
+                    <div class="form-group">
+                        <label for="user">Username</label>
+                        <input type="text" id="user" placeholder="your_username">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="your_password">
+                </div>
+                <button onclick="configureDatabase()">Configure Database</button>
+                <div id="db-result"></div>
+            </div>
+
+            <!-- File Upload Section -->
+            <div class="section">
+                <h2>📤 Upload & Sync Spreadsheet</h2>
+                <div class="form-group">
+                    <label>Select File</label>
+                    <div class="file-upload">
+                        <input type="file" id="fileInput" accept=".csv,.xlsx,.xls">
+                        <label for="fileInput" class="file-upload-label">
+                            📁 Choose spreadsheet file (CSV, Excel)
+                        </label>
+                    </div>
+                </div>
+                <div class="row-flex">
+                    <div class="form-group">
+                        <label for="tableName">Table Name</label>
+                        <input type="text" id="tableName" value="imported_data" placeholder="table_name">
+                    </div>
+                    <div class="form-group">
+                        <label for="primaryKey">Primary Key</label>
+                        <input type="text" id="primaryKey" value="id" placeholder="id">
+                    </div>
+                </div>
+                <div class="row-flex">
+                    <div class="form-group">
+                        <label for="sheetName">Sheet Name (Excel only)</label>
+                        <input type="text" id="sheetName" placeholder="Leave empty for first sheet">
+                    </div>
+                    <div class="form-group">
+                        <label for="createTable">Create Table</label>
+                        <select id="createTable">
+                            <option value="true">Yes, create if doesn't exist</option>
+                            <option value="false">No, use existing table</option>
+                        </select>
+                    </div>
+                </div>
+                <button onclick="uploadAndSync()">Upload & Sync</button>
+                
+                <div class="loading" id="uploadLoading">
+                    <div class="spinner"></div>
+                    <p>Processing your file...</p>
+                </div>
+                
+                <div id="upload-result"></div>
+            </div>
+
+            <!-- Tables Management Section -->
+            <div class="section">
+                <h2>🗂️ Database Tables</h2>
+                <button onclick="loadTables()">Refresh Tables</button>
+                <div id="tables-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+
+        // Configure database
+        async function configureDatabase() {
+            const config = {
+                host: document.getElementById('host').value,
+                port: parseInt(document.getElementById('port').value),
+                database: document.getElementById('database').value,
+                user: document.getElementById('user').value,
+                password: document.getElementById('password').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/config/database`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(config)
+                });
+
+                const result = await response.json();
+                const resultDiv = document.getElementById('db-result');
+
+                if (response.ok) {
+                    resultDiv.innerHTML = `<div class="result success">✅ ${result.message}</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="result error">❌ ${result.detail || 'Configuration failed'}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('db-result').innerHTML = 
+                    `<div class="result error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        // Upload and sync file
+        async function uploadAndSync() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a file first');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('table_name', document.getElementById('tableName').value);
+            formData.append('primary_key', document.getElementById('primaryKey').value);
+            formData.append('create_table', document.getElementById('createTable').value);
+            
+            const sheetName = document.getElementById('sheetName').value;
+            if (sheetName) {
+                formData.append('sheet_name', sheetName);
+            }
+
+            const loadingDiv = document.getElementById('uploadLoading');
+            const resultDiv = document.getElementById('upload-result');
+            
+            loadingDiv.style.display = 'block';
+            resultDiv.innerHTML = '';
+
+            try {
+                const response = await fetch(`${API_BASE}/upload-excel`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                loadingDiv.style.display = 'none';
+
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="result success">
+                            ✅ ${result.message}
+                            <div class="stats">
+                                <div class="stat-card">
+                                    <div class="stat-number">${result.stats.inserted}</div>
+                                    <div class="stat-label">Inserted</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-number">${result.stats.updated}</div>
+                                    <div class="stat-label">Updated</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-number">${result.stats.deleted}</div>
+                                    <div class="stat-label">Deleted</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-number">${result.stats.unchanged}</div>
+                                    <div class="stat-label">Unchanged</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    loadTables(); // Refresh tables list
+                } else {
+                    resultDiv.innerHTML = `<div class="result error">❌ ${result.detail || 'Upload failed'}</div>`;
+                }
+            } catch (error) {
+                loadingDiv.style.display = 'none';
+                resultDiv.innerHTML = `<div class="result error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        // Load tables list
+        async function loadTables() {
+            try {
+                const response = await fetch(`${API_BASE}/tables`);
+                const result = await response.json();
+                
+                const container = document.getElementById('tables-container');
+                
+                if (response.ok && result.tables.length > 0) {
+                    const tablesHtml = result.tables.map(tableName => `
+                        <div class="table-card">
+                            <div class="table-name">${tableName}</div>
+                            <div class="table-info">Click to view details</div>
+                            <button onclick="viewTableDetails('${tableName}')" style="margin-top: 10px;">View Details</button>
+                            <button onclick="deleteTable('${tableName}')" style="margin-top: 5px; background: #dc3545;">Delete Table</button>
+                        </div>
+                    `).join('');
+                    
+                    container.innerHTML = `<div class="tables-list">${tablesHtml}</div>`;
+                } else {
+                    container.innerHTML = '<p>No tables found. Upload a spreadsheet to create your first table.</p>';
+                }
+            } catch (error) {
+                document.getElementById('tables-container').innerHTML = 
+                    `<div class="result error">❌ Error loading tables: ${error.message}</div>`;
+            }
+        }
+
+        // View table details
+        async function viewTableDetails(tableName) {
+            try {
+                const response = await fetch(`${API_BASE}/tables/${tableName}`);
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert(`Table: ${result.table_name}\nRows: ${result.row_count}\nColumns: ${result.columns.join(', ')}\nLast Updated: ${result.last_updated || 'Never'}`);
+                } else {
+                    alert(`Error: ${result.detail}`);
+                }
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        // Delete table
+        async function deleteTable(tableName) {
+            if (!confirm(`Are you sure you want to delete table "${tableName}"? This action cannot be undone.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/tables/${tableName}`, {
+                    method: 'DELETE'
+                });
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert(`✅ ${result.message}`);
+                    loadTables(); // Refresh tables list
+                } else {
+                    alert(`❌ ${result.detail}`);
+                }
+            } catch (error) {
+                alert(`❌ Error: ${error.message}`);
+            }
+        }
+
+        // Update file input label when file is selected
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const label = document.querySelector('.file-upload-label');
+            if (e.target.files.length > 0) {
+                label.textContent = `📁 ${e.target.files[0].name}`;
+            } else {
+                label.textContent = '📁 Choose spreadsheet file (CSV, Excel)';
+            }
+        });
+
+        // Load tables on page load
+        window.addEventListener('load', function() {
+            // Try to load existing database config
+            fetch(`${API_BASE}/config/database`)
+                .then(response => response.json())
+                .then(config => {
+                    if (config.host) {
+                        document.getElementById('host').value = config.host;
+                        document.getElementById('database').value = config.database;
+                        document.getElementById('user').value = config.user;
+                        document.getElementById('port').value = config.port;
+                    }
+                })
+                .catch(() => {
+                    // Config not set yet, that's okay
+                });
+        });
+    </script>
+</body>
+</html>
