@@ -1,9 +1,9 @@
+# MySQL Table:
+![image](https://github.com/user-attachments/assets/b1c22a51-94df-43fc-8b74-3ba85fe5af9e)
 
-![image](https://github.com/user-attachments/assets/1225a8eb-fc83-48e9-8a77-60cb1c01f0d4)
+# Excel Sheet:
+![image](https://github.com/user-attachments/assets/baf85750-f97f-4380-8bd9-66d6b6af97a7)
 
-
-
-![image](https://github.com/user-attachments/assets/b7e33d08-3f22-4357-bdbf-3049c24fdb34)
 
 # UI using HTML:
 ![image](https://github.com/user-attachments/assets/3ed77cc9-969c-4840-ba2f-70f71ce888e3)
